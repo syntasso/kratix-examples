@@ -1,0 +1,16 @@
+apiVersion: platform.kratix.io/v1alpha1
+kind: BucketStateStore
+metadata:
+  name: default
+spec:
+  # Bucket name: required
+  bucketName: BUCKET_NAME
+  # The endpoint of the bucket provider: required
+  endpoint: storage.googleapis.com
+  # Valid options: accessKey, and IAM; defaults to accessKey
+  authMethod: accessKey
+  # Required when using accessKey auth method
+  secretRef:
+    # The name and namespace of the secret to use to authenticate
+    name: gcp-bucket-credentials
+    namespace: kratix-platform-system

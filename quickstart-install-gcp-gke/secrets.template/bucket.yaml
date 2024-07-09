@@ -1,0 +1,13 @@
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: Bucket
+metadata:
+  name: kratix
+  namespace: flux-system
+spec:
+  provider: generic
+  interval: 5s
+  bucketName: BUCKET_NAME
+  endpoint: storage.googleapis.com
+  secretRef:
+    name: gcp-bucket-credentials
+  timeout: 60s
