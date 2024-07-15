@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+promise_dir="$( cd $(dirname $0)/../.. && pwd)"
+declare -a args=( "$@" )
+
+pipeline_image="ghcr.io/syntasso/kratix-examples/s3-hcp-configure-pipeline:v0.1.0"
+pipeline_dir=${promise_dir}/internal/configure-pipeline""
+
+set -- "${args[@]}"
+while [ $# -gt 0 ]; do
+    case "$1" in
+        build)
+            docker build \
+                --tag "${pipeline_image}" \
+                --platform linux/$(uname -m) \
+                ${pipeline_dir} ;;
+
+        load)
+            kind load docker-image "${pipeline_image}" --name platform ;;
+
+        push)
+            if ! docker buildx ls | grep -q "kratix-image-builder"; then
+                docker buildx create --name kratix-image-builder;
+            fi
+            platform="${BUILD_PLATFORM:-linux/arm64,linux/amd64}"
+            docker buildx build \
+                --builder kratix-image-builder \
+                --tag "${pipeline_image}" \
+                --platform $platform \
+                --push \
+                "${PWD}/${pipeline_dir}" ;;
+
+        rmi)
+            docker rmi --force "${pipeline_image}" ;;
+
+        pull)
+            docker pull "${pipeline_image}" ;;
+
+        *)
+            echo "unknown command $1"
+            exit 1
+            ;;
+    esac
+    shift
+done
+

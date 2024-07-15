@@ -1,0 +1,64 @@
+#!/usr/bin/env sh
+
+set -eux
+
+if [ "${KRATIX_WORKFLOW_TYPE}" = "promise" ]; then
+  cat <<EOF > /kratix/output/main.tf
+terraform {
+}
+
+provider "aws" {
+    region = "us-east-1"
+}
+EOF
+  exit 0
+fi
+
+# read user input
+providedName="$(yq eval '.metadata.name' /kratix/input/object.yaml)"
+isPublic="$(yq eval '.spec.public' /kratix/input/object.yaml)"
+
+# check if this is a re-run (e.g. after an update)
+bucket=$(yq eval '.status.bucketName // ""' /kratix/input/object.yaml)
+if [ -z "${bucket}" ]; then
+  # resource does not have .status.bucketName set, so this is a new resource
+  bucket="${ORG_NAME}-org-${providedName}-$RANDOM"
+fi
+
+acl="private"
+if [ "${isPublic}" = "true" ]; then
+  acl="public-read"
+fi
+
+# create a terraform file that creates a bucket
+cat <<EOF > /kratix/output/${bucket}.tf
+module "${bucket}_s3_bucket" {
+  source = "terraform-aws-modules/s3-bucket/aws"
+
+  bucket = "${bucket}"
+  acl    = "${acl}"
+
+  control_object_ownership = true
+  object_ownership         = "ObjectWriter"
+
+  versioning = {
+    enabled = false
+  }
+
+  tags = {
+    source= "kratix"
+    team= "kratix-team"
+    provisioned-by= "kratix"
+  }
+}
+
+output "${bucket}-domain" {
+  value = module.${bucket}_s3_bucket.s3_bucket_bucket_domain_name
+}
+EOF
+
+# update the resource status
+cat <<EOF > /kratix/metadata/status.yaml
+ready: "False"
+bucketName: ${bucket}
+EOF
