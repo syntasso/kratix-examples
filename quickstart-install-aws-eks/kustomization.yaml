@@ -1,0 +1,30 @@
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta1
+kind: Kustomization
+metadata:
+  name: kratix-workload-resources
+  namespace: flux-system
+spec:
+  interval: 3s
+  prune: true
+  dependsOn:
+    - name: kratix-workload-dependencies
+  sourceRef:
+    kind: Bucket
+    name: kratix-bucket
+  path: ./worker/resources
+  validation: client
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta1
+kind: Kustomization
+metadata:
+  name: kratix-workload-dependencies
+  namespace: flux-system
+spec:
+  interval: 8s
+  prune: true
+  sourceRef:
+    kind: Bucket
+    name: kratix-bucket
+  path: ./worker/dependencies
+  validation: client

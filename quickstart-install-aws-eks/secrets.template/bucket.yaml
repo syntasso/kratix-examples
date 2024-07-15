@@ -1,0 +1,13 @@
+---
+apiVersion: source.toolkit.fluxcd.io/v1beta1
+kind: Bucket
+metadata:
+  name: kratix-bucket
+  namespace: flux-system
+spec:
+  interval: 10s
+  provider: generic
+  bucketName: BUCKET_NAME
+  endpoint: BUCKET_NAME_ENDPOINT
+  secretRef:
+    name: aws-credentials

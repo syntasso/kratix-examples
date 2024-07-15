@@ -1,0 +1,11 @@
+apiVersion: platform.kratix.io/v1alpha1
+kind: BucketStateStore
+metadata:
+  name: default
+spec:
+  bucketName: BUCKET_NAME
+  endpoint: BUCKET_ENDPOINT
+  authMethod: accessKey
+  secretRef:
+    name: aws-bucket-credentials
+    namespace: default
