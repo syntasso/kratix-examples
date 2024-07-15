@@ -1,0 +1,16 @@
+apiVersion: platform.kratix.io/v1alpha1
+kind: GitStateStore
+metadata:
+  name: default
+spec:
+  # URL: required
+  url: GIT_REPO_URL
+  # The branch to write to: optional, defaults to main
+  branch: main
+  # Valid options: basicAuth and ssh
+  authMethod: basicAuth
+  # Required when using accessKey auth method
+  secretRef:
+    # The name and namespace of the secret to use to authenticate
+    name: azure-git-credentials
+    namespace: kratix-platform-system

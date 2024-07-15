@@ -1,0 +1,13 @@
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: GitRepository
+metadata:
+  name: kratix
+  namespace: flux-system
+spec:
+  interval: 5m0s
+  url: GIT_REPO_URL
+  ref:
+    branch: main
+  secretRef:
+    name: azure-git-credentials
+  timeout: 60s
