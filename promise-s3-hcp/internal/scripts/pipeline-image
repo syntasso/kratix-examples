@@ -22,15 +22,15 @@ while [ $# -gt 0 ]; do
 
         push)
             if ! docker buildx ls | grep -q "kratix-image-builder"; then
-                docker buildx create --name kratix-image-builder;
+                docker buildx create --name kratix-image-builder
             fi
+            docker buildx use kratix-image-builder
             platform="${BUILD_PLATFORM:-linux/arm64,linux/amd64}"
             docker buildx build \
-                --builder kratix-image-builder \
                 --tag "${pipeline_image}" \
                 --platform $platform \
                 --push \
-                "${PWD}/${pipeline_dir}" ;;
+                "${pipeline_dir}" ;;
 
         rmi)
             docker rmi --force "${pipeline_image}" ;;
