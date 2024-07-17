@@ -8,6 +8,6 @@ spec:
   interval: 10s
   provider: generic
   bucketName: BUCKET_NAME
-  endpoint: BUCKET_NAME_ENDPOINT
+  endpoint: BUCKET_ENDPOINT
   secretRef:
-    name: aws-credentials
+    name: aws-bucket-credentials

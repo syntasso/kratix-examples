@@ -32,3 +32,35 @@ For `BUCKET_KEY_ID` and `BUCKET_ACCESS_KEY`, please set to AWS credentials that 
 For `RDS_KEY_ID` and `RDS_ACCESS_KEY`, please set to AWS credentials that have permission to create AWS RDS instances.
 
 ## Updating manifests
+
+There are a number of manifests that require updating with the environment variable values.
+Some of this data is sensitive. For that reason, the files have been added to .gitignore.
+You should not include these if you push your changes to a remote repository.
+
+```bash
+mkdir -p ${DIR_EXAMPLES}/secrets && rm ${DIR_EXAMPLES}/secrets/**
+sed \
+    -e "s/RDS_KEY_ID/$RDS_KEY_ID/" \
+    -e "s/RDS_ACCESS_KEY/$RDS_ACCESS_KEY/" \
+    ${DIR_EXAMPLES}/secrets.template/bucket-secret.yaml > ${DIR_EXAMPLES}/secrets/bucket-secret.yaml
+
+sed \
+    -e "s/BUCKET_KEY_ID/$BUCKET_KEY_ID/" \
+    -e "s/BUCKET_ACCESS_KEY/$BUCKET_ACCESS_KEY/" \
+    ${DIR_EXAMPLES}/secrets.template/bucket-secret.yaml > ${DIR_EXAMPLES}/secrets/bucket-secret.yaml
+
+sed \
+    -e "s/BUCKET_KEY_ID/$BUCKET_KEY_ID/" \
+    -e "s/BUCKET_ACCESS_KEY/$BUCKET_ACCESS_KEY/" \
+    ${DIR_EXAMPLES}/secrets.template/bucketstatestore-secret.yaml > ${DIR_EXAMPLES}/secrets/bucketstatestore-secret.yaml
+
+sed \
+    -e "s/BUCKET_NAME/$BUCKET_NAME/" \
+    -e "s/BUCKET_ENDPOINT/$BUCKET_ENDPOINT/" \
+    ${DIR_EXAMPLES}/secrets.template/bucket.yaml > ${DIR_EXAMPLES}/secrets/bucket.yaml
+
+sed \
+    -e "s/BUCKET_NAME/$BUCKET_NAME/" \
+    -e "s/BUCKET_ENDPOINT/$BUCKET_ENDPOINT/" \
+    ${DIR_EXAMPLES}/secrets.template/bucketstatestore.yaml > ${DIR_EXAMPLES}/secrets/bucketstatestore.yaml
+```
