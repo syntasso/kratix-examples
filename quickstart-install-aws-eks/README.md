@@ -1,6 +1,10 @@
 # Kratix on Amazon Elastic Kubernetes Service (EKS)
 
 Welcome to the repository for deploying Kratix on EKS.
+
+These manifests are designed to be used alongside the [video demo](https://youtu.be/PSm_C4-dIvM)
+and related [docs](https://docs.kratix.io/main/guides/installing-kratix-EKS).
+
 These docs assume that
 1. You have access to an AWS account and have permissions for S3 buckets and RDS instances.
 2. You have created an S3 bucket you want Kratix to write to.
