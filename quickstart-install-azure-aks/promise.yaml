@@ -46,15 +46,17 @@ spec:
             volumes:
             - name: creds
               secret:
-                secretName: gcp-credentials
+                secretName: azure-credentials
                 items:
-                - key: project_id
-                  path: project_id
-                - key: credentialsjson
-                  path: credentials.json
+                - key: key
+                  path: key.pem
+                - key: servicePrincipalID
+                  path: service-principal-id
+                - key: tenantID
+                  path: tenant-id
             containers:
-              - image: ghcr.io/syntasso/kratix-marketplace/gcp-configure-pipeline:v0.1.0
-                name: gcp-configure-pipeline
+              - image: ghcr.io/syntasso/kratix-marketplace/azure-configure-pipeline:v0.1.0
+                name: azure-configure-pipeline
                 volumeMounts:
                 - name: creds
                   readOnly: true
@@ -69,15 +71,17 @@ spec:
             volumes:
             - name: creds
               secret:
-                secretName: gcp-credentials
+                secretName: azure-credentials
                 items:
-                - key: project_id
-                  path: project_id
-                - key: credentialsjson
-                  path: credentials.json
+                - key: key
+                  path: key.pem
+                - key: servicePrincipalID
+                  path: service-principal-id
+                - key: tenantID
+                  path: tenant-id
             containers:
-              - image: ghcr.io/syntasso/kratix-marketplace/gcp-configure-pipeline:v0.1.0
-                name: gcp-delete-pipeline
+              - image: ghcr.io/syntasso/kratix-marketplace/azure-configure-pipeline:v0.1.0
+                name: azure-delete-pipeline
                 volumeMounts:
                 - name: creds
                   readOnly: true
