@@ -2,7 +2,7 @@
 
 Welcome to the repository for deploying Kratix on AKS.
 
-These manifests are designed to be used alongside the [video demo](tbd)
+These manifests are designed to be used alongside the [video demo](https://www.youtube.com/watch?v=pj_AEaPdJjg)
 and related [docs](https://docs.kratix.io/main/guides/installing-kratix-AKS).
 
 These docs assume:
