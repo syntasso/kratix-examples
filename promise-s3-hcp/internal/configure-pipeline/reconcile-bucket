@@ -16,7 +16,7 @@ fi
 
 # read user input
 providedName="$(yq eval '.metadata.name' /kratix/input/object.yaml)"
-isPublic="$(yq eval '.spec.public' /kratix/input/object.yaml)"
+isPublic="$(yq eval '.spec.bucketConfig.public' /kratix/input/object.yaml)"
 
 # check if this is a re-run (e.g. after an update)
 bucket=$(yq eval '.status.bucketName // ""' /kratix/input/object.yaml)
