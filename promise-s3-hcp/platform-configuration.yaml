@@ -26,6 +26,7 @@ metadata:
   labels:
     environment: hcp
 spec:
+  path: tf-blog
   strictMatchLabels: true
   filepath:
     mode: none

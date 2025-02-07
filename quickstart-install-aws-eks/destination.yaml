@@ -5,6 +5,7 @@ metadata:
   labels:
     environment: dev
 spec:
+  path: worker
   stateStoreRef:
     kind: BucketStateStore
     name: default
