@@ -11,24 +11,16 @@ These docs assume that
 
 ## Setting local variables
 
-These manifests require permissions access and create resources in your AWS account.
-You need the following environment variables set:
+These manifests require permissions access and create resources in your AWS account, you will need the following environment variables set. Where possible, sensible defaults have been set:
 
-```
-DIR_EXAMPLES
-
-BUCKET_NAME
-BUCKET_ENDPOINT
-BUCKET_KEY_ID
-BUCKET_ACCESS_KEY
-
-RDS_KEY_ID
-RDS_ACCESS_KEY
-```
-
-You may set `DIR_EXAMPLES` as:
-```
+```bash
 export DIR_EXAMPLES=$(pwd)
+export BUCKET_NAME=
+export BUCKET_ENDPOINT=
+export BUCKET_KEY_ID=
+export BUCKET_ACCESS_KEY=
+export RDS_KEY_ID=
+export RDS_ACCESS_KEY=
 ```
 
 `BUCKET_NAME` and `BUCKET_ENDPOINT` should be set to an existing S3 bucket, which Kratix will use as its StateStore.
@@ -38,33 +30,30 @@ For `RDS_KEY_ID` and `RDS_ACCESS_KEY`, please set to AWS credentials that have p
 ## Updating manifests
 
 There are a number of manifests that require updating with the environment variable values.
-Some of this data is sensitive. For that reason, the files have been added to .gitignore.
-You should not include these if you push your changes to a remote repository.
+Some of this data is sensitive. For that reason, the files have been added to
+`.gitignore`. You should _not_ include these if you push your changes to a remote repository.
 
+To create these secrets use:
 ```bash
-mkdir -p ${DIR_EXAMPLES}/secrets && rm ${DIR_EXAMPLES}/secrets/**
-sed \
-    -e "s/RDS_KEY_ID/$RDS_KEY_ID/" \
-    -e "s/RDS_ACCESS_KEY/$RDS_ACCESS_KEY/" \
-    ${DIR_EXAMPLES}/secrets.template/bucket-secret.yaml > ${DIR_EXAMPLES}/secrets/bucket-secret.yaml
-
-sed \
-    -e "s/BUCKET_KEY_ID/$BUCKET_KEY_ID/" \
-    -e "s/BUCKET_ACCESS_KEY/$BUCKET_ACCESS_KEY/" \
-    ${DIR_EXAMPLES}/secrets.template/bucket-secret.yaml > ${DIR_EXAMPLES}/secrets/bucket-secret.yaml
-
-sed \
-    -e "s/BUCKET_KEY_ID/$BUCKET_KEY_ID/" \
-    -e "s/BUCKET_ACCESS_KEY/$BUCKET_ACCESS_KEY/" \
-    ${DIR_EXAMPLES}/secrets.template/bucketstatestore-secret.yaml > ${DIR_EXAMPLES}/secrets/bucketstatestore-secret.yaml
-
-sed \
-    -e "s/BUCKET_NAME/$BUCKET_NAME/" \
-    -e "s/BUCKET_ENDPOINT/$BUCKET_ENDPOINT/" \
-    ${DIR_EXAMPLES}/secrets.template/bucket.yaml > ${DIR_EXAMPLES}/secrets/bucket.yaml
-
-sed \
-    -e "s/BUCKET_NAME/$BUCKET_NAME/" \
-    -e "s/BUCKET_ENDPOINT/$BUCKET_ENDPOINT/" \
-    ${DIR_EXAMPLES}/secrets.template/bucketstatestore.yaml > ${DIR_EXAMPLES}/secrets/bucketstatestore.yaml
+./generate-secrets
 ```
+
+### Configuring Kratix
+
+Once the secrets are generated you can apply them to your cluster with a single command:
+```bash
+kubectl apply -f secrets/
+```
+
+These secrets are used by the gitops config that should be applied next using:
+```bash
+kubectl apply -f config/
+```
+
+To verify everything is working as expected, you should see the namespace `kratix-worker-system` appear after a minute or two.
+
+Please see Kratix docs to further debug the connection if this does not appear.
+
+## Build your platform with Kratix
+
+You can use any of the Promises in the [Kratix Marketplace](https://docs.kratix.io/marketplace) or any custom Promises. We recommend that you can get started with the Cloud SQL promises found [here](https://github.com/syntasso/kratix-marketplace/tree/main/sql).

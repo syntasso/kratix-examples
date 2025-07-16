@@ -44,21 +44,27 @@ spec:
             namespace: default
           spec:
             volumes:
-            - name: creds
-              secret:
-                secretName: gcp-credentials
-                items:
-                - key: project_id
-                  path: project_id
-                - key: credentialsjson
-                  path: credentials.json
+              - name: creds
+                secret:
+                  secretName: gcp-credentials
+                  items:
+                    - key: project_id
+                      path: project_id
+                    - key: credentialsjson
+                      path: credentials.json
             containers:
+              - image: ghcr.io/syntasso/kratix-pipeline-debugger:v0.0.1
+                name: debug
+                volumeMounts:
+                  - name: creds
+                    readOnly: true
+                    mountPath: "/creds"
               - image: ghcr.io/syntasso/kratix-marketplace/gcp-configure-pipeline:v0.1.0
                 name: gcp-configure-pipeline
                 volumeMounts:
-                - name: creds
-                  readOnly: true
-                  mountPath: "/creds"
+                  - name: creds
+                    readOnly: true
+                    mountPath: "/creds"
       delete:
         - apiVersion: platform.kratix.io/v1alpha1
           kind: Pipeline
@@ -67,19 +73,19 @@ spec:
             namespace: default
           spec:
             volumes:
-            - name: creds
-              secret:
-                secretName: gcp-credentials
-                items:
-                - key: project_id
-                  path: project_id
-                - key: credentialsjson
-                  path: credentials.json
+              - name: creds
+                secret:
+                  secretName: gcp-credentials
+                  items:
+                    - key: project_id
+                      path: project_id
+                    - key: credentialsjson
+                      path: credentials.json
             containers:
               - image: ghcr.io/syntasso/kratix-marketplace/gcp-configure-pipeline:v0.1.0
                 name: gcp-delete-pipeline
                 volumeMounts:
-                - name: creds
-                  readOnly: true
-                  mountPath: "/creds"
+                  - name: creds
+                    readOnly: true
+                    mountPath: "/creds"
 status: {}
