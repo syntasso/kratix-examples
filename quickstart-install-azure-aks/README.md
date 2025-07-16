@@ -12,22 +12,17 @@ These docs assume:
 ## Setting local variables
 
 Given these manifests require permissions to both your Azure Cloud Platform
-(Azure) account, you will need the following environment variables set:
+(Azure) account, you will need the following environment variables set. Where possible,
+sensible defaults have been set:
 
-```
-DIR_EXAMPLES
-AZURE_SERVICE_PRINCIPAL_ID
-AZURE_SERVICE_PRINCIPAL_KEY_PATH
-AZURE_TENANT_ID
-GIT_REPO_URL
-GIT_REPO_USER
-GIT_REPO_TOKEN
-```
-
-Defaults which may work for you are:
-
-```
+```bash
 export DIR_EXAMPLES=$(pwd)
+export AZURE_SERVICE_PRINCIPAL_ID=
+export AZURE_SERVICE_PRINCIPAL_KEY_PATH=
+export AZURE_TENANT_ID=
+export GIT_REPO_URL=
+export GIT_REPO_USER=
+export GIT_REPO_TOKEN=
 ```
 
 For the `GIT_REPO_URL`, `GIT_REPO_USER` and `GIT_REPO_TOKEN` environment variables, you can create a new Git repo in [Azure
@@ -46,32 +41,27 @@ There are a number of manifests that require updating with the environment varia
 Some of this data is sensitive. For that reason, the files have been added to
 `.gitignore`. You should _not_ include these if you push your changes to a remote repository.
 
-
-### Setting gcloud access
-
+To create these secrets use:
+```bash
+./generate-secrets
 ```
-mkdir -p ${DIR_EXAMPLES}/secrets && rm ${DIR_EXAMPLES}/secrets/**
-sed \
-    -e s/AZURE_SERVICE_PRINCIPAL_ID/$(echo -n $AZURE_SERVICE_PRINCIPAL_ID | base64)/ \
-    -e s/AZURE_SERVICE_PRINCIPAL_KEY/$(cat ${AZURE_SERVICE_PRINCIPAL_KEY_PATH} | base64 )/ \
-    -e s/AZURE_TENANT_ID/$(echo $AZURE_TENANT_ID | base64)/ \
-    ${DIR_EXAMPLES}/secrets.template/promise-secret.yaml > ${DIR_EXAMPLES}/secrets/promise-secret.yaml
 
-sed \
-    -e "s/GIT_REPO_USER/$GIT_REPO_USER/" \
-    -e "s/GIT_REPO_TOKEN/$GIT_REPO_TOKEN/" \
-    ${DIR_EXAMPLES}/secrets.template/gitrepository-secret.yaml > ${DIR_EXAMPLES}/secrets/gitrepository-secret.yaml
+### Configuring Kratix
 
-sed \
-    -e "s/GIT_REPO_USER/$GIT_REPO_USER/" \
-    -e "s/GIT_REPO_TOKEN/$GIT_REPO_TOKEN/" \
-    ${DIR_EXAMPLES}/secrets.template/gitstatestore-secret.yaml > ${DIR_EXAMPLES}/secrets/gitstatestore-secret.yaml
-
-sed \
-    -e "s^GIT_REPO_URL^$GIT_REPO_URL^" \
-    ${DIR_EXAMPLES}/secrets.template/gitrepository.yaml > ${DIR_EXAMPLES}/secrets/gitrepository.yaml
-
-sed \
-    -e "s^GIT_REPO_URL^$GIT_REPO_URL^" \
-    ${DIR_EXAMPLES}/secrets.template/gitstatestore.yaml > ${DIR_EXAMPLES}/secrets/gitstatestore.yaml
+Once the secrets are generated you can apply them to your cluster with a single command:
+```bash
+kubectl apply -f secrets/
 ```
+
+These secrets are used by the gitops config that should be applied next using:
+```bash
+kubectl apply -f config/
+```
+
+To verify everything is working as expected, you should see the namespace `kratix-worker-system` appear after a minute or two.
+
+Please see Kratix docs to further debug the connection if this does not appear.
+
+## Build your platform with Kratix
+
+You can use any of the Promises in the [Kratix Marketplace](https://docs.kratix.io/marketplace) or any custom Promises. We recommend that you can get started with the Cloud SQL promises found [here](https://github.com/syntasso/kratix-marketplace/tree/main/sql).

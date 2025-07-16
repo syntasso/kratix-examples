@@ -12,21 +12,14 @@ These docs assume:
 ## Setting local variables
 
 Given these manifests require permissions to both your Google Cloud Platform
-(GCP) account, you will need the following environment variables set:
+(GCP) account, you will need the following environment variables set. Where possible,
+sensible defaults have been set:
 
-```
-DIR_GCLOUD_CONFIG
-DIR_EXAMPLES
-BUCKET_NAME
-BUCKET_ACCESS_KEY
-BUCKET_SECRET_KEY
-```
-
-Defaults which may work for you are:
-```
-export DIR_GCLOUD_CONFIG="${HOME}/.config/gcloud"
+```bash
 export DIR_EXAMPLES=$(pwd)
 export BUCKET_NAME="kratix-$(whoami)-${RANDOM}"
+export BUCKET_ACCESS_KEY=
+export BUCKET_SECRET_KEY=
 ```
 
 For the Bucket environment variables, you can create a new bucket in the GCP and
@@ -38,31 +31,27 @@ There are a number of manifests that require updating with the environment varia
 Some of this data is sensitive. For that reason, the files have been added to
 `.gitignore`. You should _not_ include these if you push your changes to a remote repository.
 
-
-### Setting gcloud access
-
+To create these secrets use:
+```bash
+./generate-secrets
 ```
-mkdir -p ${DIR_EXAMPLES}/secrets && rm ${DIR_EXAMPLES}/secrets/**
-sed \
-    -e s/BASE64_ACTIVE_PROJECT_ID/$(sed -n -e 's/^project = //p' ${DIR_GCLOUD_CONFIG}/configurations/config_$(cat ${DIR_GCLOUD_CONFIG}/active_config) | base64 -w0)/ \
-    -e s/BASE64_CREDS/$(cat ${DIR_GCLOUD_CONFIG}/application_default_credentials.json | base64 -w0)/ \
-    ${DIR_EXAMPLES}/secrets.template/promise-secret.yaml > ${DIR_EXAMPLES}/secrets/promise-secret.yaml
 
-sed \
-    -e "s@BUCKET_ACCESS_KEY@$(echo -n ${BUCKET_ACCESS_KEY}|base64 -w0)@" \
-    -e "s@BUCKET_SECRET_KEY@$(echo -n ${BUCKET_SECRET_KEY}|base64 -w0)@" \
-    ${DIR_EXAMPLES}/secrets.template/bucket-secret.yaml > ${DIR_EXAMPLES}/secrets/bucket-secret.yaml
+## Configuring Kratix
 
-sed \
-    -e "s@BUCKET_ACCESS_KEY@$(echo -n ${BUCKET_ACCESS_KEY}|base64 -w0)@" \
-    -e "s@BUCKET_SECRET_KEY@$(echo -n ${BUCKET_SECRET_KEY}|base64 -w0)@" \
-    ${DIR_EXAMPLES}/secrets.template/bucketstatestore-secret.yaml > ${DIR_EXAMPLES}/secrets/bucketstatestore-secret.yaml
-
-sed \
-    -e "s@BUCKET_NAME@${BUCKET_NAME}@" \
-    ${DIR_EXAMPLES}/secrets.template/bucket.yaml > ${DIR_EXAMPLES}/secrets/bucket.yaml
-
-sed \
-    -e "s@BUCKET_NAME@${BUCKET_NAME}@" \
-    ${DIR_EXAMPLES}/secrets.template/bucketstatestore.yaml > ${DIR_EXAMPLES}/secrets/bucketstatestore.yaml
+Once the secrets are generated you can apply them to your cluster with a single command:
+```bash
+kubectl apply -f secrets/
 ```
+
+These secrets are used by the gitops config that should be applied next using:
+```bash
+kubectl apply -f config/
+```
+
+To verify everything is working as expected, you should see the namespace `kratix-worker-system` appear after a minute or two.
+
+Please see Kratix docs to further debug the connection if this does not appear.
+
+## Build your platform with Kratix
+
+You can use any of the Promises in the [Kratix Marketplace](https://docs.kratix.io/marketplace) or any custom Promises. We recommend that you can get started with the Cloud SQL promises found [here](https://github.com/syntasso/kratix-marketplace/tree/main/sql).
