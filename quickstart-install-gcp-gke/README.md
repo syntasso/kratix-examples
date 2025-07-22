@@ -26,10 +26,7 @@ sensible defaults have been set:
 
 ```bash
 export DIR_EXAMPLES=$(pwd)
-export DIR_GCLOUD_CONFIG=~/.config/gcloud
 export BUCKET_NAME="kratix-$(whoami)-${RANDOM}"
-export BUCKET_ACCESS_KEY=
-export BUCKET_SECRET_KEY=
 ```
 
 If you need to create a bucket, you can use the following commands or refer to the [GCP documentation](https://cloud.google.com/storage/docs/creating-buckets#command-line):
@@ -39,6 +36,11 @@ gcloud storage buckets create gs://${BUCKET_NAME}
 ```
 
 For the Bucket environment variables, you can either access access keys for your user account or create an access keys for service accounts [here](https://console.cloud.google.com/storage/settings;tab=interoperability).
+
+```bash
+export BUCKET_ACCESS_KEY=
+export BUCKET_SECRET_KEY=
+```
 
 ## Updating manifests
 
