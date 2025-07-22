@@ -1,18 +1,22 @@
 # Kratix on Google Kubernetes Engine (GKE)
 
-Welcome to the repository for deploying Kratix on GKE.
+Kratix runs on all Kubernetes services including Google Kubernetes Engine (GKE). There are three key components to a Kratix installation:
+1. Kratix platform orchestrator
+1. A Git or S3 storage backend for declarative code
+1. Infrastructure provider to make resources
 
-These manifests are designed to be used alongside the [video demo](https://www.youtube.com/watch?v=Zkh3FIGMsds).
+While all three components are key to the success of a scalable enterprise platform orchestrator, Kratix maintains loose coupling allowing each to be hosted in the same or different providers including air-gapped on-premise environments.
 
-These docs assume:
+This repository provides scripts to set up an S3 storage backend in Google Cloud. These scripts are not intended for production without personal review. Should you want to discuss production grade deployments, reach out to the creators of Kratix, [Syntasso](https://syntasso.io/).
+
+# Prerequisites
+
+Before continuing please confirm the following pre-requisites:
+1. You already have a Kratix installed.
+    _(To install Kratix in GKE follow these [docs](https://docs.kratix.io/main/guides/installing-kratix-GKE) or this [video demo](https://www.youtube.com/watch?v=Zkh3FIGMsds))_
 1. You have the `gcloud` CLI installed and are currently logged in
 1. You have created a GCP bucket you want Kratix to write to _(instructions to create a bucket are included below if needed)_
-1. The infrastructure used and created require additional hardening before use in production
 
-> [!TIP]
-> Note that this Promise does not require you to be running Kratix on a Google Kubernetes Engine (GKE) cluster.
->
-> If you would like to learn how to deploy Kratix to GKE, please follow these [docs](https://docs.kratix.io/main/guides/installing-kratix-GKE) to get started.
 
 ## Setting local variables
 
