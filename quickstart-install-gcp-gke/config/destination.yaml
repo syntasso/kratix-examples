@@ -1,11 +1,11 @@
 apiVersion: platform.kratix.io/v1alpha1
 kind: Destination
 metadata:
-  name: worker
+  name: gcp
   labels:
     environment: dev
 spec:
-  path: worker
+  path: gcp
   stateStoreRef:
     kind: BucketStateStore
     name: default
