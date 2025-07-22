@@ -1,7 +1,7 @@
 apiVersion: platform.kratix.io/v1alpha1
 kind: GitStateStore
 metadata:
-  name: default
+  name: azure-git
 spec:
   # URL: required
   url: GIT_REPO_URL
