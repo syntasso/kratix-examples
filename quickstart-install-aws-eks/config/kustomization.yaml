@@ -2,29 +2,29 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1beta1
 kind: Kustomization
 metadata:
-  name: kratix-workload-resources
+  name: aws-workload-resources
   namespace: flux-system
 spec:
   interval: 3s
   prune: true
   dependsOn:
-    - name: kratix-workload-dependencies
+    - name: aws-workload-dependencies
   sourceRef:
     kind: Bucket
-    name: kratix-bucket
-  path: ./worker/resources
+    name: aws-bucket
+  path: ./aws/resources
   validation: client
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1beta1
 kind: Kustomization
 metadata:
-  name: kratix-workload-dependencies
+  name: aws-workload-dependencies
   namespace: flux-system
 spec:
   interval: 8s
   prune: true
   sourceRef:
     kind: Bucket
-    name: kratix-bucket
-  path: ./worker/dependencies
+    name: aws-bucket
+  path: ./aws/dependencies
   validation: client

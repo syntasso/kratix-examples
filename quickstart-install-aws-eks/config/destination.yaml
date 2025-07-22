@@ -1,11 +1,11 @@
 apiVersion: platform.kratix.io/v1alpha1
 kind: Destination
 metadata:
-  name: worker
+  name: aws
   labels:
     environment: dev
 spec:
-  path: worker
+  path: aws
   stateStoreRef:
     kind: BucketStateStore
     name: default
