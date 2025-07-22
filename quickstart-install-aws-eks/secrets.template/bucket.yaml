@@ -2,7 +2,7 @@
 apiVersion: source.toolkit.fluxcd.io/v1
 kind: Bucket
 metadata:
-  name: kratix-bucket
+  name: aws-bucket
   namespace: flux-system
 spec:
   interval: 10s
