@@ -1,7 +1,7 @@
 apiVersion: platform.kratix.io/v1alpha1
 kind: BucketStateStore
 metadata:
-  name: default
+  name: aws-bucket
 spec:
   bucketName: BUCKET_NAME
   endpoint: BUCKET_ENDPOINT

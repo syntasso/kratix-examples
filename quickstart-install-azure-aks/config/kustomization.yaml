@@ -2,27 +2,27 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: kratix-workload-resources
+  name: azure-workload-resources
   namespace: flux-system
 spec:
   interval: 3s
   prune: true
   dependsOn:
-    - name: kratix-workload-dependencies
+    - name: azure-workload-dependencies
   sourceRef:
     kind: GitRepository
-    name: kratix
-  path: ./worker/resources
+    name: azure-git
+  path: ./azure/resources
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: kratix-workload-dependencies
+  name: azure-workload-dependencies
   namespace: flux-system
 spec:
   interval: 8s
   prune: true
   sourceRef:
     kind: GitRepository
-    name: kratix
-  path: ./worker/dependencies
+    name: azure-git
+  path: ./azure/dependencies

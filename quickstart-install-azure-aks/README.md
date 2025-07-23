@@ -1,11 +1,19 @@
 # Kratix on Azure Kubernetes Service (AKS)
 
-Welcome to the repository for deploying Kratix on AKS.
+Kratix runs on all Kubernetes services including Azure Kubernetes Service (AKS). There are three key components to a Kratix installation:
+1. Kratix platform orchestrator
+1. A Git or S3 storage backend for declarative code
+1. Infrastructure provider to make resources
 
-These manifests are designed to be used alongside the [video demo](https://www.youtube.com/watch?v=pj_AEaPdJjg)
-and related [docs](https://docs.kratix.io/main/guides/installing-kratix-AKS).
+While all three components are key to the success of a scalable enterprise platform orchestrator, Kratix maintains loose coupling allowing each to be hosted in the same or different providers including air-gapped on-premise environments.
 
-These docs assume:
+This repository provides scripts to set up an Git storage backend in Azure. These scripts are not intended for production without personal review. Should you want to discuss production grade deployments, reach out to the creators of Kratix, [Syntasso](https://syntasso.io/).
+
+# Prerequisites
+
+Before continuing please confirm the following pre-requisites:
+1. You already have a Kratix installed.
+    _(To install Kratix in GKE follow these [docs](https://docs.kratix.io/main/guides/installing-kratix-AKS) or this [video demo](https://www.youtube.com/watch?v=pj_AEaPdJjg))_
 1. You have the `az` CLI installed and are currently logged in
 1. You have created a Azure Git Repo you want Kratix to write to
 
@@ -17,9 +25,6 @@ sensible defaults have been set:
 
 ```bash
 export DIR_EXAMPLES=$(pwd)
-export AZURE_SERVICE_PRINCIPAL_ID=
-export AZURE_SERVICE_PRINCIPAL_KEY_PATH=
-export AZURE_TENANT_ID=
 export GIT_REPO_URL=
 export GIT_REPO_USER=
 export GIT_REPO_TOKEN=
@@ -64,4 +69,4 @@ Please see Kratix docs to further debug the connection if this does not appear.
 
 ## Build your platform with Kratix
 
-You can use any of the Promises in the [Kratix Marketplace](https://docs.kratix.io/marketplace) or any custom Promises. We recommend that you can get started with the Cloud SQL promises found [here](https://github.com/syntasso/kratix-marketplace/tree/main/sql).
+You can use any of the Promises in the [Kratix Marketplace](https://docs.kratix.io/marketplace) or any custom Promises. We recommend that you can get started with the Cloud SQL promises found [here](https://github.com/syntasso/kratix-marketplace/tree/main/sql/azure).

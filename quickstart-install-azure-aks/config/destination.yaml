@@ -1,11 +1,11 @@
 apiVersion: platform.kratix.io/v1alpha1
 kind: Destination
 metadata:
-  name: worker
+  name: azure
   labels:
     environment: dev
 spec:
-  path: worker
+  path: azure
   stateStoreRef:
     kind: GitStateStore
     name: default

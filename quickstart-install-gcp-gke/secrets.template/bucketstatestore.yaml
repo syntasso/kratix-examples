@@ -1,7 +1,7 @@
 apiVersion: platform.kratix.io/v1alpha1
 kind: BucketStateStore
 metadata:
-  name: default
+  name: gcp-bucket
 spec:
   # Bucket name: required
   bucketName: BUCKET_NAME
