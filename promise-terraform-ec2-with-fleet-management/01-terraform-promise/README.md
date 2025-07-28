@@ -1,19 +1,18 @@
 # Terraform Promise
 
-In this README we will explain how you can create and customise a Promise by
-bootstraping it from a Terraform module.
-
+In this README, we’ll explain how to create and customise a Kratix Promise by
+bootstrapping it from a Terraform module.
 
 ## Prerequisites
 
-To complete this tutorial you will need access to:
+To complete this tutorial, you’ll need access to:
 
-- Kubernetes Cluster: Any provider can be used, for simplicity of handling
-Docker images using a local cluster like KinD or Minikube is preferable as you
-can load the images directly into the cluster.
+- A Kubernetes Cluster: Any provider can be used. For ease of working with
+Docker images, a local cluster such as KinD or Minikube is preferable since you
+can load images directly into the cluster.
 
-- AWS (or other cloud provider) account: This is required to create the
-  terraform resources
+- An AWS (or other cloud provider) account: Required for provisioning Terraform
+resources.
 
 - The following CLIs:
 
@@ -22,76 +21,65 @@ can load the images directly into the cluster.
   - [**kratix**](https://github.com/syntasso/kratix-cli/releases): For
   bootstrapping the Promise
 
-  - **docker**: For building the Docker image
+  - **docker**: For building Docker images
 
 ## Introduction
-Terraform is a popular Infrastructure as Code (IaC) tool that allows you to
-define and provision infrastructure using declarative configuration files. In
-lots of existing platforms, Terraform is used to manage the underlying
-infrastructure, and is normally either:
 
-- Maintained centrally by a platform team
-  - Developers raise tickets or PRs to request changes
-- Used by developers to provision their own infrastructure
-  - Developers write, run and maintain Terraform code to manage their own
-  resources
+Terraform is a popular Infrastructure as Code (IaC) tool that lets you define
+and provision infrastructure using declarative configuration files. In many
+platform setups, Terraform is used to manage infrastructure in one of two ways:
 
-Both of these approaches have their own challenges, such as:
+- Centrally managed by a platform team
+  - Developers raise tickets or PRs to request infrastructure changes
+- Directly managed by developers
+  - Developers write, run, and maintain their own Terraform code
 
-- Manual based workflows that centralise Terraform can lead to bottlenecks and
-delays in provisioning resources.
+Both approaches come with challenges, such as:
 
-- Developers managing their own Terraform code can lead to inconsistencies,
-duplication, and a lack of governance, as well as a high cognitive load
+- Centralised workflows can lead to provisioning bottlenecks and delays
+- Developer-managed Terraform can result in inconsistencies, duplication, and
+  governance gaps, along with high cognitive overhead
 
-Kratix tries to solve this by making it easy to expose anything you want to
-offer on your platform as a self-serve API. Once its being consumed by Kratix,
-it can then be managed as a fleet of resources, allowing you to apply governance
-and policies to the resources, as well as providing a consistent user experience
-all while keeping the cost of managing the platform low.
+Kratix helps address these challenges by making it easy to expose infrastructure
+as a self-service API. Once consumed via Kratix, resources can be managed as a
+fleet, enabling governance, consistency, and low overhead—all while offering a
+great user experience.
 
-In this example we will show how easy it is to achieve a self-serve, fleet
-management offering using Kratix. We will use the
+In this example, we’ll demonstrate how to create a self-serve, fleet-managed
+infrastructure offering using Kratix. We'll use the
 [terraform-aws-ec2-instance](https://github.com/terraform-aws-modules/terraform-aws-ec2-instance)
-module as an example, however you may use any module you wish and follow the
-steps with modifications to fit your module.
+module as an example, but you can substitute in any Terraform module you like.
 
 ## Promise
 
-A [Promise](https://docs.kratix.io/main/reference/promises/intro) in Kratix consists of 4 componenets:
+A [Promise](https://docs.kratix.io/main/reference/promises/intro) in Kratix is composed of four components:
 
-- API: Where you define what information you want from a user when they make a
-request
+- API: Defines the input schema for user requests
 
-- Workflows: A series of Docker contains that run when a user makes, updates,
-delete a request to the Promise (as well as at a regular cadense to do drift
-detection)
+- Workflows: A series of Docker containers that run when a user creates, updates,
+  deletes a request—or at intervals for drift detection
 
-- Dependencies: Anything that needs to be resolved before the Promise can be
-accepted requests.
+- Dependencies: External dependencies that must be resolved before accepting requests
 
-- Destination Selectors: Where the Promise will schedule any of its declarative
-workloads.
+- Destination Selectors: Define where the Promise will schedule workloads
 
-In this tutorial we will create a simple Promise that focuses on just using the
-the API and Workflows components. If you are curious on how to create a Promise
-with Dependencies and Destination Selectors, please refer to the main
-[workshop](https://docs.kratix.io/workshop/intro)
-
+In this tutorial, we’ll create a Promise that focuses only on the API and Workflow components.
+For an example that includes Dependencies and Destination Selectors, refer to the full
+[workshop](https://docs.kratix.io/workshop/intro).
 
 ### Initialise the Promise
 
 The Kratix CLI provides an `init` command to quickly create a Promise from a
-Terraform module. It will a Promise with:
-- An API thats equivalent to the Terraform Module vars file
-- A Workflow that will read the API inputs and use that to generate the
-corresponding Terraform code to create the resources.
+Terraform module. This command creates:
 
-This provides a strong starting point for your Promise, and you can then
-customise it to fit your needs.
+- An API that mirrors the variables defined in the Terraform module
+- A Workflow that reads those API inputs and generates Terraform code to create
+  the resources
 
-To initalise the Promise, run the following command in the directory where you
-want to create the Promise:
+This is a strong starting point and can be customised as needed.
+
+To initialise the Promise, run the following command in the directory where you
+want to generate the Promise:
 
 ```bash
 kratix init tf-module-promise vm \
@@ -103,32 +91,29 @@ kratix init tf-module-promise vm \
   --module-source https://github.com/terraform-aws-modules/terraform-aws-ec2-instance
 ```
 
-You might see a series of **warnings** about the API not being fully defined with
-defaults. This is expected as the Terraform module supports a level of complex
-defaulting the Kratix API does not support yet. The API will still work, it just
-wont automatically declare some of the defaults for you.
+You may see some **warnings** about defaults not being inferred for all API
+fields. This is expected—Kratix doesn’t yet fully support the advanced
+defaulting that some Terraform modules offer. Your API will still work; it just
+won’t automatically expose all module defaults.
 
-If you inspect the `promise.yaml` that got created, you will see that it has:
-- An API consisting of the equivalent of the Terraform module's
-  variables, with some defaults set.
-- A Workflow that will runs a single container, this container will generate the
-  terraform module instance with all of the users inputs.
+After running the command, inspect the generated `promise.yaml`. You’ll find:
 
-This is a great starting point for your Promise, if you were choosing to have
-all of your terraform reconciled via a Git Repository, you could simply take
-this Promise and add a Destination Selector to it, and it would start
-schedule the terraform generated by the Workflow to the Git repository everytime
-a user makes a request to the Promise.
+- An API generated from the module’s variables, with some defaults set
+- A Workflow that runs a single container to generate Terraform code from the user input
 
-For simplicity in this demo we aren't going to do that, instead we will run
-terraform apply directly in the Workflow container.
+This is a great base for your Promise. If you're using GitOps to reconcile
+Terraform, you could now simply add a Destination Selector and Kratix would
+schedule the generated Terraform to your Git repository.
+
+For simplicity, in this demo we’ll instead run `terraform apply` directly inside
+the workflow container.
 
 ### Terraform Apply
-Lets update the promise to run `terraform apply` in the Workflow container.
 
-Add the follow container to run after the  `terraform-generate` container thats
-located at the bottom of the `promise.yaml` file (it should be after the
-`terraform-generate` container):
+Let’s update the Promise to run `terraform apply` inside the workflow container.
+
+Add the following container below the existing `terraform-generate` container in
+the `promise.yaml` file:
 
 ```yaml
 - name: terraform-apply
@@ -183,17 +168,14 @@ located at the bottom of the `promise.yaml` file (it should be after the
           key: region
 ```
 
-Ensure you've: 
-- indented it correctly, it should be at the same level as the
-`terraform-generate` container.
-- Replaced the `TODO` bucket name in the `backend.tf` backend provider to a valid S3 bucket name
-  that you have access to and exists. This bucket will be used to store the Terraform state.
-- If you plan to use a different cloud provider, you will need to change the
-environment variables to match the credentials and region for that provider.
+Be sure to:
 
-The last thing to do before we can run the Promise is to ensure we have created
-the `aws-creds` secret in the cluster. To create the secret (in this example
-AWS), run:
+- Indent the container properly so it aligns with `terraform-generate`
+- Replace the `TODO` in the bucket name with a valid S3 bucket you own
+- Adjust the credentials/environment variables if you're targeting a cloud
+  provider other than AWS
+
+Lastly, make sure the `aws-creds` secret exists:
 
 ```bash
 kubectl create secret generic aws-creds \
@@ -203,10 +185,11 @@ kubectl create secret generic aws-creds \
 ```
 
 ### Testing the Promise
-Now that we have the Promise set up, we can test it by creating a request to
-the Promise. When we ran `kratix init` it created a `example-request.yaml` that
-contains a sample request to the Promise. Update this file to set a subnet (the
-only required field) to a valid subnet in your AWS account, e.g:
+
+With the Promise created and the secret in place, you can test it by submitting
+a request. The `kratix init` command will have created a sample
+`example-request.yaml`. Edit it to include a valid `subnet_id`, such as:
+
 ```yaml
 apiVersion: example.com/v1
 kind: VM
@@ -216,51 +199,45 @@ spec:
   subnet_id: subnet-123456789abcdefghi
 ```
 
-and then run:
+Then apply it:
 
 ```bash
 kubectl apply -f example-request.yaml
 ```
 
-You should see this kick off th workload Pod that will run the
-`terraform-generate` and `terraform-apply` containers. You can check the
-status of the Pod by running:
+This will trigger a workload Pod that runs both the `terraform-generate` and
+`terraform-apply` containers. Monitor it with:
 
 ```bash
 kubectl get pods -l kratix.io/promise-name=vm -w
 ```
 
-You can inspect the logs for your `terraform-apply` container by running (it
-might take some time before the logs can be seen, as the previous init
-containers need to complete first):
+Once the `terraform-generate` container finishes, you can watch the logs for
+`terraform-apply`:
 
 ```bash
 kubectl logs -l kratix.io/promise-name=vm -c terraform-apply
 ```
 
-Eventually the Pod will complete and you should see the EC2 instance
-created in your AWS account. 
+Once complete, the EC2 instance should be visible in your AWS account.
 
-You've now successfully:
+You’ve now successfully:
+
 - ✅ Created a Promise from a Terraform module
-- ✅ Customised the Promise to run `terraform apply` in the Workflow container
-- ✅ Tested the Promise by creating a request to it and seeing the EC2 instance
-  created in your AWS account
+- ✅ Customised it to run `terraform apply` as part of the Workflow
+- ✅ Tested it by creating an EC2 instance via a self-serve Kratix API
 
-This is an excellent starting point for creating a self-serve API for providing
-infrastructure resources to your users. You can further enhance the Promise by
-adding more (or less!) API fields, integrating extra business logic (e.g. manual
-approvals, notifications or billing) and support deletion. Lets tackle the last
-part now.
+This provides a solid foundation for building a self-service platform API for
+infrastructure. You can now iterate: enhance the API, add policies or
+approvals, and more. Let's now add deletion support.
 
-### Enhancing for deletion
+### Enhancing for Deletion
 
-To enhance the Promise to support deletion, we need to add a new Workflow that
-will run when a user deletes a request to the Promise. This Workflow will
-essentially run `terraform destroy` to remove the resources created by the
-Promise. Update the `promise.yaml` file to add the following. It should sit as a
-peer to the `.spec.workflows.resource.configure` Workflow, so it should be at
-the same level of indentation
+To enable support for deletion, you need to define a `delete` Workflow that runs
+when a user deletes their request. This Workflow will run `terraform destroy`.
+
+Add the following block next to the existing `.spec.workflows.resource.configure`
+workflow in `promise.yaml`:
 
 ```yaml
       delete:
@@ -313,31 +290,31 @@ the same level of indentation
                       key: region
 ```
 
-
-Apply the updated Promise:
+Apply your updated Promise:
 
 ```bash
 kubectl apply -f promise.yaml
 ```
-Now you can test the deletion by running:
+
+Then test deletion by removing your request:
 
 ```bash
 kubectl delete -f example-request.yaml
 ```
 
-This will trigger the `instance-delete` Workflow, which will run the
-`terraform-destroy` container to remove the resources created by the Promise.
+This triggers the `instance-delete` workflow and runs the `terraform-destroy`
+container to tear down the provisioned infrastructure.
 
-You can check the status of the Pod by running:
+Monitor the workload Pod with:
 
 ```bash
 kubectl get pods -l kratix.io/promise-name=vm -w
 ```
 
-You can inspect the logs for your `terraform-destroy` container by running:
+And inspect the logs of the destroy container:
 
 ```bash
 kubectl logs -l kratix.io/promise-name=vm -l kratix.io/workflow-action=delete -c terraform-destroy
 ```
 
-You should see the EC2 instance being destroyed in your AWS account.
+You should see the EC2 instance being destroyed from your AWS account.
