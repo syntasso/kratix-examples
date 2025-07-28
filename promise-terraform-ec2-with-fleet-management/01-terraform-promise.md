@@ -161,8 +161,10 @@ Be sure to:
   provider other than AWS
 
 <details>
+
   <summary>Click here to see what the full `promise.yaml` should look like so far</summary>
-  ```
+
+  ```yaml
   apiVersion: platform.kratix.io/v1alpha1
   kind: Promise
   metadata:
@@ -585,7 +587,7 @@ Be sure to:
                     echo "Reading inputs from /kratix/input/object.yaml"
                     NAME=$(awk '/^[[:space:]]*name:/ { print $2; exit }' /kratix/input/object.yaml | tr -d '"')
                     NAMESPACE=$(awk '/^[[:space:]]*namespace:/ { print $2; exit }' /kratix/input/object.yaml | tr -d '"')
-
+                      
                     echo "Setting up Terraform working directory"
                     mkdir -p /tmp/tf-apply/
                     cd /tmp/tf-apply/
@@ -608,8 +610,8 @@ Be sure to:
                     terraform init
                     echo "Applying Terraform configuration"
                     terraform apply -auto-approve
-
   ```
+
 </details>
 
 Then apply your updated Promise:
