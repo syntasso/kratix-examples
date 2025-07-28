@@ -151,13 +151,7 @@ fleet-wide upgrade.
 
 ## Summary
 
-With just a few YAML edits, you’ve now seen how Kratix enables:
-- 🚀 Rapid rollout of changes across all infrastructure created via a Promise
-- 🔁 Easy iteration and governance without touching individual requests
-- 🔒 Consistent config and tagging across your fleet
-
-This kind of control is what makes Kratix a powerful platform building tool—not
-just for self-service, but for managing infrastructure at scale.
-
-Ready for the next step? Let’s look at how to enforce policy and introduce
-pguardrails in Part 3.
+With just a few YAML edits, you’ve now seen how Kratix enables rapid rollout of
+changes across all infrastructure created via a Promise. This kind of control is
+what makes Kratix a powerful platform building tool—not just for self-service,
+but for managing infrastructure at scale.
