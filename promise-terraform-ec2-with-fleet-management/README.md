@@ -7,5 +7,4 @@ This directory contains a guide on how to:
 - Highlight how you can use Kratix to fleet manage your infrastructure
   thats been provisioned by Terraform.
 
-To get started, `cd` into the `01-terraform-promise` directory and follow the
-README instructions there.
+To get started, open [01-terraform-promise.md](./01-terraform-promise.md).
