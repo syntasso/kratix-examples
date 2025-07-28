@@ -321,4 +321,4 @@ In the next section, we will show how you can use a Promise to manage its
 requests as a fleet, allowing you to apply policies and manage resources at
 scale.
 
-[../02-fleet-management/README.md](../02-fleet-management/README.md)
+[02-fleet-management.md](./02-fleet-management.md)
