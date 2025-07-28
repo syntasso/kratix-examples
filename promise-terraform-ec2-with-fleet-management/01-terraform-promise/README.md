@@ -7,9 +7,7 @@ bootstrapping it from a Terraform module.
 
 To complete this tutorial, you’ll need access to:
 
-- A Kubernetes Cluster: Any provider can be used. For ease of working with
-Docker images, a local cluster such as KinD or Minikube is preferable since you
-can load images directly into the cluster.
+- A Kubernetes Cluster: Any provider can be used.
 
 - An AWS (or other cloud provider) account: Required for provisioning Terraform
 resources.
@@ -20,8 +18,6 @@ resources.
   
   - [**kratix**](https://github.com/syntasso/kratix-cli/releases): For
   bootstrapping the Promise
-
-  - **docker**: For building Docker images
 
 ## Introduction
 
