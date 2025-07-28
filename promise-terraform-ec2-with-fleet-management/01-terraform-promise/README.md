@@ -38,7 +38,7 @@ Both approaches come with challenges, such as:
 
 Kratix helps address these challenges by making it easy to expose infrastructure
 as a self-service API. Once consumed via Kratix, resources can be managed as a
-fleet, enabling governance, consistency, and low overhead—all while offering a
+fleet, enabling governance, consistency, and low overhead, all while offering a
 great user experience.
 
 In this example, we’ll demonstrate how to create a self-serve, fleet-managed
@@ -53,7 +53,7 @@ A [Promise](https://docs.kratix.io/main/reference/promises/intro) in Kratix is c
 - API: Defines the input schema for user requests
 
 - Workflows: A series of Docker containers that run when a user creates, updates,
-  deletes a request—or at intervals for drift detection
+  deletes a request, or at intervals for drift detection
 
 - Dependencies: External dependencies that must be resolved before accepting requests
 
@@ -75,11 +75,12 @@ Terraform module. This command creates:
 This is a strong starting point and can be customised as needed.
 
 To initialise the Promise, run the following command in the directory where you
-want to generate the Promise:
+want to generate the Promise, update the `--dir` flag to point to your desired
+directory to store the Promise in, or or keep as `.` to use the current directory:
 
 ```bash
 kratix init tf-module-promise vm \
-  --split --group example.com \
+  --group example.com \
   --kind VM \
   --version v1 \
   --dir . \
@@ -88,7 +89,7 @@ kratix init tf-module-promise vm \
 ```
 
 You may see some **warnings** about defaults not being inferred for all API
-fields. This is expected—Kratix doesn’t yet fully support the advanced
+fields. This is expected, Kratix doesn’t yet fully support the advanced
 defaulting that some Terraform modules offer. Your API will still work; it just
 won’t automatically expose all module defaults.
 
@@ -122,6 +123,7 @@ the `promise.yaml` file:
       echo "Reading inputs from /kratix/input/object.yaml"
       NAME=$(awk '/^[[:space:]]*name:/ { print $2; exit }' /kratix/input/object.yaml | tr -d '"')
       NAMESPACE=$(awk '/^[[:space:]]*namespace:/ { print $2; exit }' /kratix/input/object.yaml | tr -d '"')
+      BUCKET_NAME="TODO REPLACE ME WITH YOUR S3 BUCKET NAME"
 
 
       echo "Setting up Terraform working directory"
@@ -135,7 +137,7 @@ the `promise.yaml` file:
       cat <<EOF > backend.tf
       terraform {
         backend "s3" {
-          bucket = "kratix-examples-TODO-ORG-NAME"
+          bucket = "${BUCKET_NAME}"
           key    = "${NAMESPACE}-${NAME}-terraform.tfstate"
           region = "${AWS_REGION}"
         }
@@ -167,7 +169,8 @@ the `promise.yaml` file:
 Be sure to:
 
 - Indent the container properly so it aligns with `terraform-generate`
-- Replace the `TODO` in the bucket name with a valid S3 bucket you own
+- Update the `BUCKET_NAME` variable to point to your S3 bucket where
+  Terraform state will be stored. This bucket must exist in your AWS account.
 - Adjust the credentials/environment variables if you're targeting a cloud
   provider other than AWS
 
@@ -314,3 +317,22 @@ kubectl logs -l kratix.io/promise-name=vm -l kratix.io/workflow-action=delete -c
 ```
 
 You should see the EC2 instance being destroyed from your AWS account.
+
+### Conclusion
+You’ve now created a fully functional Kratix Promise that allows users to:
+- ✅ Create an EC2 instance via a self-service API
+- ✅ Delete it using the same API
+
+This example demonstrates how Kratix can simplify infrastructure management by
+exposing Terraform modules as self-service APIs. You can extend this further by
+adding more features, such as:
+- Additional API fields for more or less configuration options
+- Policies for governance and compliance
+- Approvals for sensitive operations
+- Integration with other systems for notifications or logging
+
+In the next section, we will show how you can use a Promise to manage its
+requests as a fleet, allowing you to apply policies and manage resources at
+scale.
+
+[../02-fleet-management/README.md](../02-fleet-management/README.md)
