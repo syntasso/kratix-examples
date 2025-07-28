@@ -113,74 +113,70 @@ Add the following container below the existing `terraform-generate` container in
 the `promise.yaml` file:
 
 ```yaml
-- name: terraform-apply
-  image: hashicorp/terraform:1.8.3
-  command:
-    - /bin/sh
-    - -c
-    - |
-      set -euo pipefail
-      echo "Reading inputs from /kratix/input/object.yaml"
-      NAME=$(awk '/^[[:space:]]*name:/ { print $2; exit }' /kratix/input/object.yaml | tr -d '"')
-      NAMESPACE=$(awk '/^[[:space:]]*namespace:/ { print $2; exit }' /kratix/input/object.yaml | tr -d '"')
-      BUCKET_NAME="TODO REPLACE ME WITH YOUR S3 BUCKET NAME"
+            - name: terraform-apply
+              image: hashicorp/terraform:1.8.3
+              envFrom:
+                - secretRef:
+                    name: aws-creds
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  set -euo pipefail
+                  echo "Reading inputs from /kratix/input/object.yaml"
+                  NAME=$(awk '/^[[:space:]]*name:/ { print $2; exit }' /kratix/input/object.yaml | tr -d '"')
+                  NAMESPACE=$(awk '/^[[:space:]]*namespace:/ { print $2; exit }' /kratix/input/object.yaml | tr -d '"')
 
+                  echo "Setting up Terraform working directory"
+                  mkdir -p /tmp/tf-apply/
+                  cd /tmp/tf-apply/
 
-      echo "Setting up Terraform working directory"
-      mkdir -p /tmp/tf-apply/
-      cd /tmp/tf-apply/
+                  echo "Copying Terraform files from /kratix/output/"
+                  cp -r /kratix/output/* .
 
-      echo "Copying Terraform files from /kratix/output/"
-      cp -r /kratix/output/* .
+                  echo "Creating backend.tf file for Terraform state management"
+                  cat <<EOF > backend.tf
+                  terraform {
+                    backend "s3" {
+                      bucket = "${BUCKET_NAME}"
+                      key    = "envs/${NAMESPACE}-${NAME}-terraform.tfstate"
+                      region = "${AWS_REGION}"
+                    }
+                  }
+                  EOF
 
-      echo "Creating backend.tf file for Terraform state management"
-      cat <<EOF > backend.tf
-      terraform {
-        backend "s3" {
-          bucket = "${BUCKET_NAME}"
-          key    = "${NAMESPACE}-${NAME}-terraform.tfstate"
-          region = "${AWS_REGION}"
-        }
-      }
-      EOF
-
-      echo "Initialising Terraform"
-      terraform init
-      echo "Applying Terraform configuration"
-      terraform apply -auto-approve
-  env:
-    - name: AWS_ACCESS_KEY_ID
-      valueFrom:
-        secretKeyRef:
-          name: aws-creds
-          key: access_key_id
-    - name: AWS_SECRET_ACCESS_KEY
-      valueFrom:
-        secretKeyRef:
-          name: aws-creds
-          key: secret_access_key
-    - name: AWS_REGION
-      valueFrom:
-        secretKeyRef:
-          name: aws-creds
-          key: region
+                  echo "Initialising Terraform"
+                  terraform init
+                  echo "Applying Terraform configuration"
+                  terraform apply -auto-approve
 ```
 
 Be sure to:
 
 - Indent the container properly so it aligns with `terraform-generate`
-- Update the `BUCKET_NAME` variable to point to your S3 bucket where
-  Terraform state will be stored. This bucket must exist in your AWS account.
 - Adjust the credentials/environment variables if you're targeting a cloud
   provider other than AWS
 
-Lastly, make sure the `aws-creds` secret exists:
+<details>
+  <summary>Click here to see what the full `promise.yaml` should look like so far</summary>
+  TODO
+</details>
+
+Then apply your updated Promise:
+
+```bash
+kubectl apply -f promise.yaml
+```
+
+Lastly, make sure the `aws-creds` secret exists, include within it the
+`BUCKET_NAME` you want to use for storing the Terraform state:
 
 ```bash
 kubectl create secret generic aws-creds \
-  --from-literal=access_key_id=$AWS_ACCESS_KEY_ID \
-  --from-literal=secret_access_key=$AWS_SECRET_ACCESS_KEY \
-  --from-literal=region=$AWS_REGION
+  --from-literal=AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
+  --from-literal=AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
+  --from-literal=AWS_REGION=$AWS_REGION \
+  --from-literal=BUCKET_NAME=<YOUR_S3_BUCKET_NAME_FOR_STORING_TF_STATE>
 ```
 
 ### Testing the Promise
@@ -215,7 +211,7 @@ Once the `terraform-generate` container finishes, you can watch the logs for
 `terraform-apply`:
 
 ```bash
-kubectl logs -l kratix.io/promise-name=vm -c terraform-apply
+kubectl logs -l kratix.io/promise-name=vm -c terraform-apply -f
 ```
 
 Once complete, the EC2 instance should be visible in your AWS account.
@@ -248,6 +244,9 @@ workflow in `promise.yaml`:
             containers:
             - name: terraform-destroy
               image: hashicorp/terraform:1.8.3
+              envFrom:
+                - secretRef:
+                    name: aws-creds
               command:
                 - /bin/sh
                 - -c
@@ -262,7 +261,7 @@ workflow in `promise.yaml`:
                   cat <<EOF > backend.tf
                   terraform {
                     backend "s3" {
-                      bucket = "kratix-examples-jake"
+                      bucket = "${BUCKET_NAME}"
                       key    = "envs/${NAMESPACE}-${NAME}-terraform.tfstate"
                       region = "${AWS_REGION}"
                     }
@@ -271,23 +270,13 @@ workflow in `promise.yaml`:
 
                   terraform init
                   terraform destroy -auto-approve
-              env:
-                - name: AWS_ACCESS_KEY_ID
-                  valueFrom:
-                    secretKeyRef:
-                      name: aws-creds
-                      key: access_key_id
-                - name: AWS_SECRET_ACCESS_KEY
-                  valueFrom:
-                    secretKeyRef:
-                      name: aws-creds
-                      key: secret_access_key
-                - name: AWS_REGION
-                  valueFrom:
-                    secretKeyRef:
-                      name: aws-creds
-                      key: region
 ```
+
+
+<details>
+  <summary>Click here to see what the full `promise.yaml` should look like so far</summary>
+  TODO
+</details>
 
 Apply your updated Promise:
 
@@ -304,19 +293,16 @@ kubectl delete -f example-request.yaml
 This triggers the `instance-delete` workflow and runs the `terraform-destroy`
 container to tear down the provisioned infrastructure.
 
-Monitor the workload Pod with:
+The delete pod runs, and if successfull the resource is deleted from Kratix,
+removing all associated Kratix resources (including the delete workflow pod
+itself!). If your quick you may see the delete pod in the list of pods while its
+deleting the resource:
 
 ```bash
 kubectl get pods -l kratix.io/promise-name=vm -w
 ```
 
-And inspect the logs of the destroy container:
-
-```bash
-kubectl logs -l kratix.io/promise-name=vm -l kratix.io/workflow-action=delete -c terraform-destroy
-```
-
-You should see the EC2 instance being destroyed from your AWS account.
+You should see the EC2 instance has been destroyed from your AWS account.
 
 ### Conclusion
 You’ve now created a fully functional Kratix Promise that allows users to:
