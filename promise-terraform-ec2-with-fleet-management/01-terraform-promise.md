@@ -1230,9 +1230,9 @@ kubectl delete -f example-request.yaml
 This triggers the `instance-delete` workflow and runs the `terraform-destroy`
 container to tear down the provisioned infrastructure.
 
-The delete pod runs, and if successfull the resource is deleted from Kratix,
+The delete pod runs, and if successful the resource is deleted from Kratix,
 removing all associated Kratix resources (including the delete workflow pod
-itself!). If your quick you *may* see the delete pod in the list of pods while its
+itself!). If you're quick you *may* see the delete pod in the list of pods while it's
 deleting the resource. If you don't, this means delete was successful!
 
 ```bash
