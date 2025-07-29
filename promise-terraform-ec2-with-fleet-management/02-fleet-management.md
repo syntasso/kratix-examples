@@ -3,7 +3,7 @@
 Welcome to Part 2 of the tutorial!
 
 If you haven’t completed Part 1 yet, head over to
-[01-terraform-promise/README.md](../01-terraform-promise/README.md) to learn how
+[01-terraform-promise/README.md](../01-terraform-promise.md) to learn how
 to build a Terraform-based Promise and deploy EC2 instances via a self-serve
 Kratix API. It’s a great intro to the power of Promises and a solid foundation
 for what we’re about to explore.
@@ -88,7 +88,7 @@ kubectl get pods -l kratix.io/promise-name=vm -w
 Now let’s simulate a real-world update: The platform team decide to mandate that all VMs provisioned need to follow a strict tagging protocol. In the world where app devs are managing their own terraform, the platform team has to ask each engineer to update their terraform and the turnaround will be paifully slow. With Kratix, all we have to do is update the Promise workflow to have a container
 modify the terraform before it reaches the apply step.
 
-Add the following container **between the `terraform-plan` and `terraform-apply` steps** in your `promise.yaml`:
+Add the following container **between the `terraform-generate` and `terraform-apply` steps** in your `promise.yaml`:
 
 ```yaml
             - name: enforce-tags
