@@ -43,7 +43,7 @@ Start by creating a few more VM resources using the same Promise. Set the
 `AWS_SUBNET_ID` env var to the subnet used in part 1 and then run:
 
 ```bash
-cat << EOF > multi-requests.yaml
+cat << EOF | kubectl apply -f -
 ---
 apiVersion: example.com/v1
 kind: VM
