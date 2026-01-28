@@ -1,0 +1,10 @@
+#!/usr/bin/env sh
+
+set -euxo pipefail
+
+cd resources
+BUCKETNAME=$(yq -r '.spec.bucketName' /kratix/input/object.yaml)
+TEAMNAME=$(yq -r '.spec.team' /kratix/input/object.yaml)
+
+sed "s/BUCKETNAME/${BUCKETNAME}/g; s/TEAMNAME/${TEAMNAME}/g" template.tf > "/kratix/output/$BUCKETNAME-$TEAMNAME.tf"
+

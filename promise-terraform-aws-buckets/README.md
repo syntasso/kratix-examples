@@ -9,14 +9,10 @@ guide](https://docs.kratix.io/ske/guides/promise-from-tf-module).
 
 ## API properties
 
-The properties exposed by this API come from the [Terraform module for S3
-Buckets at version
-1.51.0](https://github.com/terraform-aws-modules/terraform-aws-s3-bucket.git?ref=v5.10.0).
-
 To add changes to this Promise's API, you can use the `kratix update api`
 command, for example:
 ```
-kratix update api --property name:string --property team --kind S3
+kratix update api --property team:string
 ```
 
 ## Updating Workflows
@@ -24,7 +20,7 @@ kratix update api --property name:string --property team --kind S3
 To add workflow containers, you can use the `kratix add container` command:
 
 ```
-kratix add container resource/configure/pipeline0 --image syntasso/postgres-resource:v1.0.0
+kratix add container resource/configure/s3-bucket-dest --image kratix-guide/s3-bucket-dest-resource-pipeline:v0.1.0 --language python
 ```
 
 ## Updating Dependencies
