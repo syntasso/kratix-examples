@@ -14,8 +14,7 @@ def resource_configure() -> int:
 
     selectors: List[ks.DestinationSelector] = [
         ks.DestinationSelector(match_labels={
-            "team": team,
-            "environment": "terraform"
+            team: f"{team}-workspace"
         })
     ]
     
