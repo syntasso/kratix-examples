@@ -1,7 +1,6 @@
 apiVersion: platform.kratix.io/v1alpha1
 kind: Promise
 metadata:
-  creationTimestamp: null
   labels:
     kratix.io/promise-version: v0.0.1
   name: s3
@@ -10,7 +9,6 @@ spec:
     apiVersion: apiextensions.k8s.io/v1
     kind: CustomResourceDefinition
     metadata:
-      creationTimestamp: null
       name: s3s.example.syntasso.io
     spec:
       group: example.syntasso.io
@@ -25,7 +23,6 @@ spec:
           openAPIV3Schema:
             properties:
               spec:
-                default: {}
                 properties:
                   bucketName:
                     description: (Optional, Forces new resource) The name of the bucket.
@@ -42,14 +39,7 @@ spec:
             type: object
         served: true
         storage: true
-    status:
-      acceptedNames:
-        kind: ""
-        plural: ""
-      conditions: null
-      storedVersions: null
   workflows:
-    config: {}
     promise:
       configure:
       - apiVersion: platform.kratix.io/v1alpha1
@@ -58,28 +48,21 @@ spec:
           name: dependencies
         spec:
           containers:
-          - image: kratix-workshop/s3-promise-pipeline:v0.1.0
+          - image: ghcr.io/syntasso/kratix-examples/s3-promise-pipeline:v0.1.0
             name: configure-deps
     resource:
       configure:
       - apiVersion: platform.kratix.io/v1alpha1
         kind: Pipeline
         metadata:
-          creationTimestamp: null
           name: s3-bucket-dest-resource-pipeline
         spec:
           containers:
-          - command:
-            - /app/scripts/set-destination-selectors
-            image: kratix-guide/s3-bucket-dest-resource-pipeline:v0.1.0
+          - image: ghcr.io/syntasso/kratix-examples/s3-bucket-dest-resource-pipeline:v0.1.0
             name: s3-bucket-dest-selectors
-          - command:
-            - /app/scripts/template-bucket
-            image: kratix-guide/s3-bucket-dest-resource-pipeline:v0.1.0
+            command:
+            - /app/scripts/set-destination-selectors
+          - image: ghcr.io/syntasso/kratix-examples/kratix-guide/s3-bucket-dest-resource-pipeline:v0.1.0
             name: s3-bucket-template
-          jobOptions: {}
-          rbac: {}
-status:
-  workflows: 0
-  workflowsFailed: 0
-  workflowsSucceeded: 0
+            command:
+            - /app/scripts/template-bucket
