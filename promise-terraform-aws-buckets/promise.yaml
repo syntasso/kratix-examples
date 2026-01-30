@@ -48,7 +48,7 @@ spec:
           name: dependencies
         spec:
           containers:
-          - image: ghcr.io/syntasso/kratix-examples/s3-promise-pipeline:v0.1.0
+          - image: ghcr.io/syntasso/kratix-examples/kratix-workshop/s3-promise-pipeline:v0.1.0
             name: configure-deps
     resource:
       configure:
@@ -58,7 +58,7 @@ spec:
           name: s3-bucket-dest-resource-pipeline
         spec:
           containers:
-          - image: ghcr.io/syntasso/kratix-examples/s3-bucket-dest-resource-pipeline:v0.1.0
+          - image: ghcr.io/syntasso/kratix-examples/kratix-guide/s3-bucket-dest-resource-pipeline:v0.1.0
             name: s3-bucket-dest-selectors
             command:
             - /app/scripts/set-destination-selectors
